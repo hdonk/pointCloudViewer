@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/joml-1.9.14.jar"/>
+	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl.jar"/>
+	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-egl.jar"/>
+	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-glfw.jar"/>
+	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-opengles.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
