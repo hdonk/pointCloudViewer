@@ -7,16 +7,19 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import eora3D.PointCmd;
 import eora3D.RGB3DPoint;
 
 public class pointCloudViewer implements Runnable
 {
-	static private DatagramSocket socket = null;
+	static private ServerSocket socket = null;
 	static private PointCloudObject m_pco = null;
 	static private pointCloudViewer m_pcv = null;
 
@@ -40,16 +43,16 @@ public class pointCloudViewer implements Runnable
 		}
 		try
 		{
-			socket = new DatagramSocket(7778, InetAddress.getLoopbackAddress());
+			socket = new ServerSocket(7778, 1, InetAddress.getLoopbackAddress());
 		} catch(Exception e)
 		{
 			e.printStackTrace();
-			System.out.println("Failed to open listen UDP socket 7778");
+			System.out.println("Failed to open listen TCP socket 7778");
 			System.exit(1);
 		}
 		if(socket.isClosed())
 		{
-			System.out.println("Failed to open listen UDP socket 7778");
+			System.out.println("Failed to open listen TCP socket 7778");
 			System.exit(1);
 		}
 		
@@ -61,60 +64,99 @@ public class pointCloudViewer implements Runnable
 	}
 	
     public void run() {
-    	byte[] buf = new byte[1];
-    	
         while (!m_pco.m_finished) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            try {
-            	socket.setSoTimeout(1000);
-				socket.receive(packet);
-			} catch (SocketTimeoutException te)
-            {
-				if(m_pco.m_finished)
-				{
-					socket.close();
-					System.out.println("Finished");
-					System.exit(0);
+        	while(true)
+        	{
+        		Socket l_conn_socket = null;
+        		try
+        		{
+	            	socket.setSoTimeout(1000);
+	            	System.out.println("Accept");
+	            	l_conn_socket = socket.accept();
+        			
+        		} catch (SocketTimeoutException te)
+	            {
+					if(m_pco.m_finished)
+					{
+						try {
+							socket.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("Finished");
+						System.exit(0);
+					}
+					continue;
+				} catch (IOException ioe)
+	            {
+	
+					// TODO Auto-generated catch block
+					ioe.printStackTrace();
+					System.exit(2);
 				}
-				continue;
-			} catch (IOException ioe)
-            {
+            	System.out.println("Accepted");
 
-				// TODO Auto-generated catch block
-				ioe.printStackTrace();
-				System.exit(2);
-			}
-            System.out.println("Received cmd "+buf[0]);
-            switch(buf[0])
-            {
-            	case 0: // Clear
-            		m_pco.clear();
-            		break;
-            	case 1: // Add point, scale & pointsize
-            		try
-            		{
-            			byte[] l_obj_buf = new byte[256];
-                        DatagramPacket l_obj_packet = new DatagramPacket(l_obj_buf, l_obj_buf.length);
-                        socket.receive(l_obj_packet);
-                        System.out.println("Received size "+l_obj_packet.getLength());
-						ByteArrayInputStream l_bais = new ByteArrayInputStream(l_obj_packet.getData());
-						ObjectInputStream l_ois = new ObjectInputStream(l_bais);
-						RGB3DPoint l_pt = (RGB3DPoint) l_ois.readObject();
-						m_pco.addPoint(l_pt);
-						m_pco.m_Pointsize = l_pt.m_pointsize;
-						m_pco.m_Scale = l_pt.m_scale;
-            		} catch (SocketTimeoutException te)
-                    {
-        				continue;
-        			} catch(Exception e)
-            		{
-            			e.printStackTrace();
-            			System.exit(3);
-            		}
-            		break;            		
-            }
+            	ObjectInputStream l_ois = null;
+	            try {
+					l_ois = new ObjectInputStream(l_conn_socket.getInputStream());
+	            } catch(Exception e)
+	            {
+	            	e.printStackTrace();
+	            	try {
+						l_conn_socket.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	            	continue;
+	            }
+            	while((!l_conn_socket.isClosed()) && l_conn_socket.isConnected())
+            	{
+        			PointCmd l_cmd = null;
+		            try {
+						l_cmd = (PointCmd) l_ois.readObject();
+					} catch (Exception ioe)
+		            {
+		
+						// TODO Auto-generated catch block
+						ioe.printStackTrace();
+						try {
+							l_conn_socket.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						continue;
+					}
+		            //System.out.println("Received cmd "+l_cmd.m_cmd);
+		            switch(l_cmd.m_cmd)
+		            {
+		            	case 0: // Clear
+		            		m_pco.clear();
+		            		break;
+		            	case 1: // Add point, scale & pointsize
+		            		try
+		            		{
+								m_pco.addPoint(l_cmd.m_point);
+								m_pco.m_Pointsize = l_cmd.m_point.m_pointsize;
+								m_pco.m_Scale = l_cmd.m_point.m_scale;
+		            		} catch(Exception e)
+		            		{
+		            			e.printStackTrace();
+		            			System.exit(3);
+		            		}
+		            		break;            		
+		            }
+            	}
+        	}
         }
-        socket.close();
+        try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         System.out.println("Finished");
         System.exit(0);
     }
