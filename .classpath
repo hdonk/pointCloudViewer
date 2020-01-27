@@ -6,26 +6,25 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/joml-1.9.14.jar"/>
-	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl.jar">
+	<classpathentry kind="lib" path="libs/joml-1.9.14.jar"/>
+	<classpathentry kind="lib" path="libs/lwjgl-egl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/linux"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="pointCloudViewer/libs/linux"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-egl.jar" sourcepath="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-egl-sources.jar">
+	<classpathentry kind="lib" path="libs/lwjgl-glfw.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-egl-javadoc.jar!/"/>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/linux"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="pointCloudViewer/libs/linux"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-glfw.jar">
+	<classpathentry kind="lib" path="libs/lwjgl-opengles.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/linux"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="pointCloudViewer/libs/linux"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/lwjgl-opengles.jar">
+	<classpathentry kind="lib" path="libs/lwjgl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/nickh/home/devel/java/eclipse-workspace/pointCloudViewer/libs/linux"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="pointCloudViewer/libs/linux"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

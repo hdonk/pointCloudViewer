@@ -1,6 +1,7 @@
 package pointCloudViewer;
 
 import static org.lwjgl.opengles.GLES20.GL_ARRAY_BUFFER;
+
 import static org.lwjgl.opengles.GLES20.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengles.GLES20.GL_FLOAT;
 import static org.lwjgl.opengles.GLES20.GL_NO_ERROR;
@@ -64,6 +65,7 @@ import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+import eora3D.RGB3DPoint;
 
 class PointCloudObject implements Runnable {
 	EGLCapabilities m_egl;
@@ -90,7 +92,7 @@ class PointCloudObject implements Runnable {
 	public float m_Pointsize;
 	public float m_Scale;
 
-	private boolean m_finished = false;
+	boolean m_finished = false;
 	
 	public PointCloudObject()
 	{
@@ -797,7 +799,7 @@ class PointCloudObject implements Runnable {
 	public void Close()
 	{
 		if(m_finished) return;
-		//glfwSetWindowShouldClose(m_window, true);
+		glfwSetWindowShouldClose(m_window, true);
 	}
 
 }
