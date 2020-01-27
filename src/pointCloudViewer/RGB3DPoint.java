@@ -1,4 +1,4 @@
-package eora3D;
+package pointCloudViewer;
 
 class RGB3DPoint
 {

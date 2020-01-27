@@ -344,8 +344,8 @@ class PointCloudObject implements Runnable {
 			Path currentRelativePath = Paths.get("");
 			String s = currentRelativePath.toAbsolutePath().toString();
 			System.out.println("Current relative path is: " + s);
-			vertexShader = readFileAsString("src/eora3D/" + vsn);
-			fragmentShader = readFileAsString("src/eora3D/" + fsn);
+			vertexShader = readFileAsString("src/pointCloudViewer/" + vsn);
+			fragmentShader = readFileAsString("src/pointCloudViewer/" + fsn);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
