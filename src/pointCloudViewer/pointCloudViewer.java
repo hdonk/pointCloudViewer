@@ -71,7 +71,6 @@ public class pointCloudViewer implements Runnable
         		try
         		{
 	            	socket.setSoTimeout(1000);
-	            	System.out.println("Accept");
 	            	l_conn_socket = socket.accept();
         			
         		} catch (SocketTimeoutException te)
@@ -95,8 +94,6 @@ public class pointCloudViewer implements Runnable
 					ioe.printStackTrace();
 					System.exit(2);
 				}
-            	System.out.println("Accepted");
-
             	ObjectInputStream l_ois = null;
 	            try {
 					l_ois = new ObjectInputStream(l_conn_socket.getInputStream());
