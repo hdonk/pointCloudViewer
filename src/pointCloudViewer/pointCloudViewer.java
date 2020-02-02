@@ -1,7 +1,8 @@
 package pointCloudViewer;
 
 import java.io.ByteArrayInputStream;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -95,17 +96,17 @@ public class pointCloudViewer implements Runnable
 					ioe.printStackTrace();
 					System.exit(2);
 				}
-            	ObjectInputStream l_ois = null;
-				ObjectOutputStream l_oos = null;
+            	DataInputStream l_dis = null;
+				DataOutputStream l_dos = null;
 	            try {
-					l_ois = new ObjectInputStream(l_conn_socket.getInputStream());
-					l_oos = new ObjectOutputStream(l_conn_socket.getOutputStream());
+					l_dis = new DataInputStream(l_conn_socket.getInputStream());
+					l_dos = new DataOutputStream(l_conn_socket.getOutputStream());
 	            } catch(Exception e)
 	            {
 	            	e.printStackTrace();
 	            	try {
-	            		l_oos.close();
-	            		l_ois.close();
+	            		l_dos.close();
+	            		l_dis.close();
 						l_conn_socket.close();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -116,10 +117,10 @@ public class pointCloudViewer implements Runnable
 	            int l_count = 0;
             	while((!l_conn_socket.isClosed()) && l_conn_socket.isConnected())
             	{
-        			PointCmd l_cmd = null;
+        			int l_cmd = 0;
 		            try {
 //		            	System.out.println("Reading object");
-						l_cmd = (PointCmd) l_ois.readObject();
+						l_cmd = l_dis.readInt();
 //		            	System.out.println("Read object");
 	            	} catch (Exception ioe)
 		            {
@@ -127,8 +128,8 @@ public class pointCloudViewer implements Runnable
 						// TODO Auto-generated catch block
 						ioe.printStackTrace();
 						try {
-		            		l_oos.close();
-		            		l_ois.close();
+		            		l_dos.close();
+		            		l_dis.close();
 							l_conn_socket.close();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -136,19 +137,33 @@ public class pointCloudViewer implements Runnable
 						}
 						continue;
 					}
-		            System.out.println("Received cmd "+l_cmd.m_cmd);
-		            switch(l_cmd.m_cmd)
+		            System.out.println("Received cmd "+l_cmd);
+		            switch(l_cmd)
 		            {
 		            	case 0: // Clear
 		            		m_pco.clear();
 		            		break;
-		            	case 1: // Add point, scale & pointsize
+		            	case 1:
+		            		float l_s, l_ps;
+		            		try
+		            		{
+			            		l_s = l_dis.readFloat();
+			            		l_ps = l_dis.readFloat();
+		            		} catch(Exception e)
+		            		{
+		            			e.printStackTrace();
+		            			break;
+		            		}
+		            		m_pco.m_Scale = l_s;
+		            		m_pco.m_Pointsize = l_ps;
+		            		break;
+		            	case 2: // Add point
 		            		try
 		            		{
 		            			//System.out.println("x "+l_cmd.m_point.m_x+" y "+l_cmd.m_point.m_y);
-								m_pco.addPoint(l_cmd.m_point);
-								m_pco.m_Pointsize = l_cmd.m_point.m_pointsize;
-								m_pco.m_Scale = l_cmd.m_point.m_scale;
+		            			RGB3DPoint l_pt = new RGB3DPoint();
+		            			l_pt.read(l_dis);
+								m_pco.addPoint(l_pt);
 								++l_count;
 								if(l_count>=1000)
 								{
@@ -161,10 +176,10 @@ public class pointCloudViewer implements Runnable
 		            			System.exit(3);
 		            		}
 		            		break;
-		            	case 2: // Sync
+		            	case 3: // Sync
 		        			try {
-		        				l_oos.writeObject(l_cmd);
-		        				l_oos.flush();
+		        				l_dos.writeInt(3);
+		        				l_dos.flush();
 		        			} catch (IOException e) {
 		        				// TODO Auto-generated catch block
 		        				e.printStackTrace();
