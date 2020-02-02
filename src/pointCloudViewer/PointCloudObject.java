@@ -86,13 +86,15 @@ class PointCloudObject implements Runnable {
 	int m_point_vbo;
 	int m_point_ibo;
 	ArrayList<RGB3DPoint> m_points;
-	boolean m_refresh = false;
+	public boolean m_refresh = false;
 	private IntBuffer m_intbuffer;
 
 	public float m_Pointsize;
 	public float m_Scale;
 
 	boolean m_finished = false;
+	
+	int m_vertexcount = 0;
 	
 	public PointCloudObject()
 	{
@@ -101,6 +103,7 @@ class PointCloudObject implements Runnable {
 	
 	public void clear()
 	{
+		m_vertexcount = 0;
 		m_points = new ArrayList<RGB3DPoint>();
 /*		m_point_vbo = -1;
 		m_point_ibo = -1;
@@ -127,7 +130,7 @@ class PointCloudObject implements Runnable {
 //			System.out.println("Refresh: "+m_refresh);
 			if(m_refresh)
 			{
-				int l_vertexcount = m_points.size();
+				m_vertexcount = m_points.size();
 //				System.out.println("Points: "+l_vertexcount);
 		        // Number of bytes we need per vertex.
 		        int l_vertexsize = 3*4 + 4*4;
@@ -146,13 +149,13 @@ class PointCloudObject implements Runnable {
 		        m_point_ibo = m_intbuffer.get(1);
 		        glBindBuffer(GL_ARRAY_BUFFER, m_point_vbo);
 		        GLok("glBindBuffer");
-		        glBufferData(GL_ARRAY_BUFFER, l_vertexcount*l_vertexsize, GL_STATIC_DRAW);
+		        glBufferData(GL_ARRAY_BUFFER, m_vertexcount*l_vertexsize, GL_STATIC_DRAW);
 		        GLok("glBufferData");
 		        FloatBuffer vertexBuffer = OESMapbuffer.glMapBufferOES(GL_ARRAY_BUFFER,
 		                GLES32.GL_WRITE_ONLY, null).asFloatBuffer();
 		        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_point_ibo);
 		        GLok("glBindBuffer");
-		        glBufferData(GL_ELEMENT_ARRAY_BUFFER, l_vertexcount*4, GL_STATIC_DRAW);
+		        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexcount*4, GL_STATIC_DRAW);
 		        GLok("glBufferData");
 		        IntBuffer indexBuffer = OESMapbuffer.glMapBufferOES(GL_ELEMENT_ARRAY_BUFFER,
 		                GLES32.GL_WRITE_ONLY, null).asIntBuffer();
@@ -184,7 +187,7 @@ class PointCloudObject implements Runnable {
 		        //System.out.println("Refreshed points "+m_point_vbo+" "+m_point_ibo);
 		        System.gc();
 			}
-			if(m_points.size()==0) return;
+			if(m_vertexcount==0) return;
 			//System.out.println("Displaying "+m_points.size()+" points "+m_point_vbo+" "+m_point_ibo);
 			glBindBuffer(GL_ARRAY_BUFFER, m_point_vbo);
 			if(!GLok("Setting glBindBuffer)")) return;
@@ -204,7 +207,7 @@ class PointCloudObject implements Runnable {
 			if(!GLok("Setting glBindVertexArray")) return;
 			
 			
-			glDrawElements(GL_POINTS, m_points.size(), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_POINTS, m_vertexcount, GL_UNSIGNED_INT, 0);
 			if(!GLok("glDrawElements")) return;
 		}
 	}
@@ -215,7 +218,7 @@ class PointCloudObject implements Runnable {
 		{
 			RGB3DPoint l_point = new RGB3DPoint(a_x, a_y, a_z, a_r, a_g, a_b);
 			this.m_points.add(l_point);
-			m_refresh = true;
+			//m_refresh = true;
 		}
 	}
 	public void addPoint(RGB3DPoint a_point)
@@ -223,7 +226,7 @@ class PointCloudObject implements Runnable {
 		synchronized(this)
 		{
 			this.m_points.add(a_point);
-			m_refresh = true;
+			//m_refresh = true;
 		}
 	}
 

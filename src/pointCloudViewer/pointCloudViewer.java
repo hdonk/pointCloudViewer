@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -95,12 +96,16 @@ public class pointCloudViewer implements Runnable
 					System.exit(2);
 				}
             	ObjectInputStream l_ois = null;
+				ObjectOutputStream l_oos = null;
 	            try {
 					l_ois = new ObjectInputStream(l_conn_socket.getInputStream());
+					l_oos = new ObjectOutputStream(l_conn_socket.getOutputStream());
 	            } catch(Exception e)
 	            {
 	            	e.printStackTrace();
 	            	try {
+	            		l_oos.close();
+	            		l_ois.close();
 						l_conn_socket.close();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -108,17 +113,22 @@ public class pointCloudViewer implements Runnable
 					}
 	            	continue;
 	            }
+	            int l_count = 0;
             	while((!l_conn_socket.isClosed()) && l_conn_socket.isConnected())
             	{
         			PointCmd l_cmd = null;
 		            try {
+//		            	System.out.println("Reading object");
 						l_cmd = (PointCmd) l_ois.readObject();
-					} catch (Exception ioe)
+//		            	System.out.println("Read object");
+	            	} catch (Exception ioe)
 		            {
 		
 						// TODO Auto-generated catch block
 						ioe.printStackTrace();
 						try {
+		            		l_oos.close();
+		            		l_ois.close();
 							l_conn_socket.close();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -126,7 +136,7 @@ public class pointCloudViewer implements Runnable
 						}
 						continue;
 					}
-		            //System.out.println("Received cmd "+l_cmd.m_cmd);
+		            System.out.println("Received cmd "+l_cmd.m_cmd);
 		            switch(l_cmd.m_cmd)
 		            {
 		            	case 0: // Clear
@@ -135,17 +145,36 @@ public class pointCloudViewer implements Runnable
 		            	case 1: // Add point, scale & pointsize
 		            		try
 		            		{
+		            			//System.out.println("x "+l_cmd.m_point.m_x+" y "+l_cmd.m_point.m_y);
 								m_pco.addPoint(l_cmd.m_point);
 								m_pco.m_Pointsize = l_cmd.m_point.m_pointsize;
 								m_pco.m_Scale = l_cmd.m_point.m_scale;
+								++l_count;
+								if(l_count>=1000)
+								{
+									m_pco.m_refresh = true;
+									l_count = 0;
+								}
 		            		} catch(Exception e)
 		            		{
 		            			e.printStackTrace();
 		            			System.exit(3);
 		            		}
-		            		break;            		
+		            		break;
+		            	case 2: // Sync
+		        			try {
+		        				l_oos.writeObject(l_cmd);
+		        				l_oos.flush();
+		        			} catch (IOException e) {
+		        				// TODO Auto-generated catch block
+		        				e.printStackTrace();
+		        				System.exit(4);
+		        			}
+		            		break;
 		            }
+		            System.gc();
             	}
+				m_pco.m_refresh = true;
         	}
         }
         try {
