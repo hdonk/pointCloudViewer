@@ -131,6 +131,11 @@ class PointCloudObject implements Runnable {
 			if(m_refresh)
 			{
 				m_vertexcount = m_points.size();
+				if(m_vertexcount==0)
+				{
+					m_refresh = false;
+					return;
+				}
 //				System.out.println("Points: "+l_vertexcount);
 		        // Number of bytes we need per vertex.
 		        int l_vertexsize = 3*4 + 4*4;

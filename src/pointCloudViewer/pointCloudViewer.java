@@ -135,9 +135,9 @@ public class pointCloudViewer implements Runnable
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						continue;
+						break;
 					}
-		            System.out.println("Received cmd "+l_cmd);
+//		            System.out.println("Received cmd "+l_cmd);
 		            switch(l_cmd)
 		            {
 		            	case 0: // Clear
@@ -165,7 +165,7 @@ public class pointCloudViewer implements Runnable
 		            			l_pt.read(l_dis);
 								m_pco.addPoint(l_pt);
 								++l_count;
-								if(l_count>=1000)
+//								if(l_count>=1000)
 								{
 									m_pco.m_refresh = true;
 									l_count = 0;
@@ -187,8 +187,8 @@ public class pointCloudViewer implements Runnable
 		        			}
 		            		break;
 		            }
-		            System.gc();
             	}
+	            System.gc();
 				m_pco.m_refresh = true;
         	}
         }
