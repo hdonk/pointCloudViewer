@@ -3,6 +3,7 @@ package pointCloudViewer;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,6 @@ import java.net.SocketTimeoutException;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import eora3D.PointCmd;
 import eora3D.RGB3DPoint;
 
 public class pointCloudViewer implements Runnable
@@ -114,7 +114,6 @@ public class pointCloudViewer implements Runnable
 					}
 	            	continue;
 	            }
-	            int l_count = 0;
             	while((!l_conn_socket.isClosed()) && l_conn_socket.isConnected())
             	{
         			int l_cmd = 0;
@@ -122,18 +121,25 @@ public class pointCloudViewer implements Runnable
 //		            	System.out.println("Reading object");
 						l_cmd = l_dis.readInt();
 //		            	System.out.println("Read object");
-	            	} catch (Exception ioe)
+	            	} catch (EOFException eof)
 		            {
-		
-						// TODO Auto-generated catch block
+						try {
+		            		l_dos.close();
+		            		l_dis.close();
+							l_conn_socket.close();
+						} catch (IOException ioe) {
+							ioe.printStackTrace();
+						}
+						break;
+					} catch (IOException ioe)
+		            {
 						ioe.printStackTrace();
 						try {
 		            		l_dos.close();
 		            		l_dis.close();
 							l_conn_socket.close();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						} catch (IOException ioe2) {
+							ioe2.printStackTrace();
 						}
 						break;
 					}
@@ -164,12 +170,6 @@ public class pointCloudViewer implements Runnable
 		            			RGB3DPoint l_pt = new RGB3DPoint();
 		            			l_pt.read(l_dis);
 								m_pco.addPoint(l_pt);
-								++l_count;
-//								if(l_count>=1000)
-								{
-									m_pco.m_refresh = true;
-									l_count = 0;
-								}
 		            		} catch(Exception e)
 		            		{
 		            			e.printStackTrace();
@@ -185,10 +185,11 @@ public class pointCloudViewer implements Runnable
 		        				e.printStackTrace();
 		        				System.exit(4);
 		        			}
+							m_pco.m_refresh = true;
+		        			System.gc();
 		            		break;
 		            }
             	}
-	            System.gc();
 				m_pco.m_refresh = true;
         	}
         }
