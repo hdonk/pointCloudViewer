@@ -186,7 +186,7 @@ public class pointCloudViewer implements Runnable
 		        				System.exit(4);
 		        			}
 							m_pco.m_refresh = true;
-		        			System.gc();
+		        			//System.gc();
 		            		break;
 		            }
             	}
