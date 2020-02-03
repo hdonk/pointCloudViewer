@@ -169,7 +169,7 @@ public class pointCloudViewer implements Runnable
 		            			//System.out.println("x "+l_cmd.m_point.m_x+" y "+l_cmd.m_point.m_y);
 		            			RGB3DPoint l_pt = new RGB3DPoint();
 		            			l_pt.read(l_dis);
-								m_pco.addPoint(l_pt);
+								m_pco.addPoint(0, l_pt);
 		            		} catch(Exception e)
 		            		{
 		            			e.printStackTrace();
