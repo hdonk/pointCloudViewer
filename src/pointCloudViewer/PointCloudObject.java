@@ -96,6 +96,9 @@ class PointCloudObject implements Runnable {
 	
 	ArrayList<Integer> m_vertexcount = null;
 	ArrayList<Integer> m_vertexoffset = null;
+	private float m_tt_angle;
+	private int m_Zrotoff;
+	private int m_Xrotoff;
 	
 	public PointCloudObject()
 	{
@@ -533,14 +536,13 @@ class PointCloudObject implements Runnable {
 		viewM.identity();
 //		viewM
 //				.lookAt(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos+2000.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		viewM
-		.lookAt(0.0f, 10.0f, 15000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		viewM.lookAt(0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 /*		viewM.translate(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos);
 		viewM.rotate(q.rotateZ((float) Math.toRadians(m_pcd.z_rot)).normalize())
 				.rotate(q0.rotateY((float) Math.toRadians(m_pcd.y_rot)).normalize())
 				.rotate(q1.rotateX((float) Math.toRadians(m_pcd.x_rot)).normalize());*/
 		modelM.identity();
-		modelM.rotate(q.rotateX((float) Math.toRadians(m_rot)).normalize());
+		modelM.rotate(q.rotateY((float) Math.toRadians(m_rot)).normalize());
 		//modelM.translate(0.0f, 0.0f, 0.0f);
 		// System.out.println("Z "+(-2f+rot/120.0f));
 
@@ -551,7 +553,9 @@ class PointCloudObject implements Runnable {
 		if (!GLok(""))
 			return;
 		modelView.identity();
-		modelView.mul(projectM).mul(viewM).mul(modelM);
+		modelView.mul(projectM);
+		modelView.mul(viewM);
+		modelView.mul(modelM);
 //		modelView = projectM.mul(viewM).mul(modelM);
 		glUniformMatrix4fv(modelViewLoc, false, modelView.get(fb));
 		if (!GLok(""))
@@ -566,9 +570,6 @@ class PointCloudObject implements Runnable {
 		if (!GLok(""))
 			return;
 
-		modelM.identity();
-		modelM.rotate(q.rotateX((float) Math.toRadians(m_rot)).normalize());
-		modelM.translate(0.0f, 0.0f, -2000.0f);
 //		modelM.rotate(q.rotateY((float) Math.toRadians(m_rot)).normalize());
 		//modelM.rotate(q.rotateX((float) Math.toRadians(m_rot)).normalize());
 //				.translate(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos)
@@ -600,14 +601,6 @@ class PointCloudObject implements Runnable {
 			if (!GLok("Setting glBindAttribLocation"))
 				return;
 		//}
-		modelViewLoc = glGetUniformLocation(l_program, "modelView");
-		if (!GLok("Calling glGetUniformLocation"))
-			return;
-		modelView.identity();
-		modelView.mul(projectM).mul(viewM).mul(modelM);
-		glUniformMatrix4fv(modelViewLoc, false, modelView.get(fb));
-		if (!GLok("Setting glUniformMatrix4fv"))
-			return;
 		scaleLoc = glGetUniformLocation(l_program, "scale");
 		GLok("Retrieving scale uniform location");
 		//System.out.println("Scale to "+((float)sbScale.getValue()/10.0f));
@@ -626,11 +619,34 @@ class PointCloudObject implements Runnable {
 			Thread.dumpStack();
 			return;
 		}
-		for(int i=0; i<m_points.size(); ++i) draw(i);
+		for(int i=0; i<m_points.size(); ++i)
+		{
+//			private int m_tt_angle;
+//			private int m_Zrotoff;
+//			private int m_Xrotoff;
+
+			
+			
+			modelM.identity();
+			modelM.translate(m_Xrotoff, 0.0f, m_Zrotoff);
+			modelM.rotate(q.rotateY((float) Math.toRadians(m_rot - i*m_tt_angle)).normalize());
+			//modelM.translate(0.0f, 0.0f, -2000.0f);
+			modelViewLoc = glGetUniformLocation(l_program, "modelView");
+			if (!GLok("Calling glGetUniformLocation"))
+				return;
+			modelView.identity();
+			modelView.mul(projectM);
+			modelView.mul(viewM);
+			modelView.mul(modelM);
+			glUniformMatrix4fv(modelViewLoc, false, modelView.get(fb));
+			if (!GLok("Setting glUniformMatrix4fv"))
+				return;
+			draw(i);
+		}
 
 		long thisTime = System.nanoTime();
 		float delta = (thisTime - lastTime) / 1E9f;
-		m_rot += delta * 20f;
+		//m_rot += delta * 20f;
 		if (m_rot > 360.0f) {
 			m_rot = 0.0f;
 		}
@@ -841,6 +857,12 @@ class PointCloudObject implements Runnable {
 	{
 		if(m_finished) return;
 		glfwSetWindowShouldClose(m_window, true);
+	}
+
+	public void setTT(float a_angle, int a_Zrotoff, int a_Xrotoff) {
+		m_tt_angle = a_angle;
+		m_Zrotoff = a_Zrotoff;
+		m_Xrotoff = a_Xrotoff;
 	}
 
 }

@@ -167,9 +167,10 @@ public class pointCloudViewer implements Runnable
 		            		try
 		            		{
 		            			//System.out.println("x "+l_cmd.m_point.m_x+" y "+l_cmd.m_point.m_y);
+		            			int l_layer = l_dis.readInt();
 		            			RGB3DPoint l_pt = new RGB3DPoint();
 		            			l_pt.read(l_dis);
-								m_pco.addPoint(0, l_pt);
+								m_pco.addPoint(l_layer, l_pt);
 		            		} catch(Exception e)
 		            		{
 		            			e.printStackTrace();
@@ -187,6 +188,20 @@ public class pointCloudViewer implements Runnable
 		        			}
 							m_pco.m_refresh = true;
 		        			//System.gc();
+		            		break;
+		            	case 4: // Turntable rotation
+		            		try
+		            		{
+		            			//System.out.println("x "+l_cmd.m_point.m_x+" y "+l_cmd.m_point.m_y);
+		            			float l_angle = l_dis.readFloat();
+		            			int l_Zrotoff = l_dis.readInt();
+		            			int l_Xrotoff = l_dis.readInt();
+		            			m_pco.setTT(l_angle, l_Zrotoff, l_Xrotoff);
+		            		} catch(Exception e)
+		            		{
+		            			e.printStackTrace();
+		            			System.exit(5);
+		            		}
 		            		break;
 		            }
             	}
