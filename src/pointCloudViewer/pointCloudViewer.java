@@ -196,6 +196,7 @@ public class pointCloudViewer implements Runnable
 		            			float l_angle = l_dis.readFloat();
 		            			int l_Zrotoff = l_dis.readInt();
 		            			int l_Xrotoff = l_dis.readInt();
+		            			System.out.println("TT rot "+l_angle+" Z "+l_Zrotoff+" X "+l_Xrotoff);
 		            			m_pco.setTT(l_angle, l_Zrotoff, l_Xrotoff);
 		            		} catch(Exception e)
 		            		{

@@ -536,7 +536,7 @@ class PointCloudObject implements Runnable {
 		viewM.identity();
 //		viewM
 //				.lookAt(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos+2000.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		viewM.lookAt(0.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		viewM.lookAt(-100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 /*		viewM.translate(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos);
 		viewM.rotate(q.rotateZ((float) Math.toRadians(m_pcd.z_rot)).normalize())
 				.rotate(q0.rotateY((float) Math.toRadians(m_pcd.y_rot)).normalize())
@@ -628,8 +628,8 @@ class PointCloudObject implements Runnable {
 			
 			
 			modelM.identity();
-			modelM.translate(m_Xrotoff, 0.0f, m_Zrotoff);
-			modelM.rotate(q.rotateY((float) Math.toRadians(m_rot - i*m_tt_angle)).normalize());
+			modelM.rotate(q.rotateY((float) Math.toRadians(i*m_tt_angle)).normalize());
+			modelM.translate(m_Xrotoff, 500.0f, m_Zrotoff);
 			//modelM.translate(0.0f, 0.0f, -2000.0f);
 			modelViewLoc = glGetUniformLocation(l_program, "modelView");
 			if (!GLok("Calling glGetUniformLocation"))
@@ -646,7 +646,7 @@ class PointCloudObject implements Runnable {
 
 		long thisTime = System.nanoTime();
 		float delta = (thisTime - lastTime) / 1E9f;
-		//m_rot += delta * 20f;
+		m_rot += delta * 5f;
 		if (m_rot > 360.0f) {
 			m_rot = 0.0f;
 		}

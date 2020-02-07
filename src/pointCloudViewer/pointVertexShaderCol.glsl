@@ -8,10 +8,10 @@ uniform float pointsize;
 out vec4 v_color;
 void main(void) {
  	gl_Position = vertex;
+ 	gl_Position = modelView * gl_Position;
  	gl_Position.x *= scale;
  	gl_Position.y *= scale;
  	gl_Position.z *= scale;
- 	gl_Position = modelView * gl_Position;
  	gl_PointSize = pointsize;
  	v_color = color;
 }
