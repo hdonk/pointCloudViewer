@@ -532,19 +532,13 @@ class PointCloudObject implements Runnable {
 		Quaternionf q1 = new Quaternionf();
 		projectM
 				.setOrtho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, -30000.0f, 30000.0f);
-//				.setPerspective((3.14159f * 2.0f) / 3.0f, (float) displayW / (float) displayH, 0.01f, 6000.0f);
 		viewM.identity();
-//		viewM
-//				.lookAt(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos+2000.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		viewM.lookAt(-100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-/*		viewM.translate(m_pcd.x_pos, m_pcd.y_pos, m_pcd.z_pos);
-		viewM.rotate(q.rotateZ((float) Math.toRadians(m_pcd.z_rot)).normalize())
-				.rotate(q0.rotateY((float) Math.toRadians(m_pcd.y_rot)).normalize())
-				.rotate(q1.rotateX((float) Math.toRadians(m_pcd.x_rot)).normalize());*/
+		// Corner view
+		//viewM.lookAt(-100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		// Top view
+		viewM.lookAt(0.0f, 1000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 		modelM.identity();
 		modelM.rotate(q.rotateY((float) Math.toRadians(m_rot)).normalize());
-		//modelM.translate(0.0f, 0.0f, 0.0f);
-		// System.out.println("Z "+(-2f+rot/120.0f));
 
 		glUseProgram(m_main_program);
 		if (!GLok(""))
@@ -628,7 +622,7 @@ class PointCloudObject implements Runnable {
 			
 			
 			modelM.identity();
-			modelM.rotate(q.rotateY((float) Math.toRadians(i*m_tt_angle)).normalize());
+			modelM.rotate(q.rotateY((float) Math.toRadians(-i*m_tt_angle)).normalize());
 			modelM.translate(m_Xrotoff, 500.0f, m_Zrotoff);
 			//modelM.translate(0.0f, 0.0f, -2000.0f);
 			modelViewLoc = glGetUniformLocation(l_program, "modelView");
