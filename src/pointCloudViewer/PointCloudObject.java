@@ -527,17 +527,15 @@ class PointCloudObject implements Runnable {
 		Matrix4f modelView = new Matrix4f();
 		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
-		Quaternionf q = new Quaternionf();
-		Quaternionf q0 = new Quaternionf();
-		Quaternionf q1 = new Quaternionf();
 		projectM
 				.setOrtho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, -30000.0f, 30000.0f);
 		viewM.identity();
 		// Corner view
-		//viewM.lookAt(-100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		viewM.lookAt(-100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 		// Top view
-		viewM.lookAt(0.0f, 1000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+		//viewM.lookAt(0.0f, 1000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 		modelM.identity();
+		Quaternionf q = new Quaternionf();
 		modelM.rotate(q.rotateY((float) Math.toRadians(m_rot)).normalize());
 
 		glUseProgram(m_main_program);
@@ -622,7 +620,8 @@ class PointCloudObject implements Runnable {
 			
 			
 			modelM.identity();
-			modelM.rotate(q.rotateY((float) Math.toRadians(-i*m_tt_angle)).normalize());
+			q = new Quaternionf();
+			modelM.rotate(q.rotateY((float) Math.toRadians(-i*m_tt_angle+m_rot)).normalize());
 			modelM.translate(m_Xrotoff, 500.0f, m_Zrotoff);
 			//modelM.translate(0.0f, 0.0f, -2000.0f);
 			modelViewLoc = glGetUniformLocation(l_program, "modelView");
