@@ -95,10 +95,18 @@ class PointCloudObject implements Runnable {
 	boolean m_finished = false;
 	
 	ArrayList<Integer> m_vertexcount = null;
+	ArrayList<Integer> m_vertexdisplaycount = null;
 	ArrayList<Integer> m_vertexoffset = null;
 	private float m_tt_angle;
 	private int m_Zrotoff;
 	private int m_Xrotoff;
+	
+	private int m_leftfilter = -5000;
+	private int m_rightfilter = 5000;
+	private int m_topfilter = 5000;
+	private int m_bottomfilter = -5000;
+	private int m_frontfilter = -5000;
+	private int m_backfilter = 5000;
 	
 	public PointCloudObject()
 	{
@@ -108,6 +116,7 @@ class PointCloudObject implements Runnable {
 	public void clear()
 	{
 		m_vertexcount = new ArrayList<Integer>();
+		m_vertexdisplaycount = new ArrayList<Integer>();
 		m_vertexoffset = new ArrayList<Integer>();
 		m_points = new ArrayList<ArrayList<RGB3DPoint>>();
 /*		m_point_vbo = -1;
@@ -176,25 +185,62 @@ class PointCloudObject implements Runnable {
 		        IntBuffer indexBuffer = OESMapbuffer.glMapBufferOES(GL_ELEMENT_ARRAY_BUFFER,
 		                GLES32.GL_WRITE_ONLY, null).asIntBuffer();
 		        
+		        /*System.out.println("Point filter l: "+m_leftfilter+ " r: "
+		        		+m_rightfilter+ " b: "
+		        		+m_bottomfilter+ " t: "
+		        		+m_topfilter+ " f: "
+		        		+m_frontfilter+ " b: "
+		        		+m_backfilter
+		        		);*/
 		        int l_count = 0;
 		        for(int al=0; al<m_points.size(); ++al)
-		        	for(int j=0; j<m_points.get(al).size(); ++j)
 		        {
-		        	RGB3DPoint l_pt = m_points.get(al).get(j);
-		        	float x = (float)l_pt.m_x;
-		        	float y = (float)l_pt.m_y;
-		        	float z = (float)l_pt.m_z;
-		        	float r = (float)l_pt.m_r/255.0f;
-		        	float g = (float)l_pt.m_g/255.0f;
-		        	float b = (float)l_pt.m_b/255.0f;
-	                vertexBuffer.put((float) x);
-	                vertexBuffer.put((float) y);
-	                vertexBuffer.put((float) z);
-	                vertexBuffer.put((float) r);
-	                vertexBuffer.put((float) g);
-	                vertexBuffer.put((float) b);
-	                vertexBuffer.put((float) 1.0f);
-	                indexBuffer.put(l_count++);
+		        	int l_vc = 0;
+		        	for(int j=0; j<m_points.get(al).size(); ++j)
+			        {
+		        		
+			        	RGB3DPoint l_pt = m_points.get(al).get(j);
+			        	if(
+			        			l_pt.m_x >= m_leftfilter &&
+	        					l_pt.m_x <= m_rightfilter &&
+			    		
+    							l_pt.m_y >= m_bottomfilter &&
+								l_pt.m_y <= m_topfilter  &&
+			    		
+								l_pt.m_z >= m_frontfilter &&
+								l_pt.m_z <= m_backfilter )
+			        	{
+
+				        	float x = (float)l_pt.m_x;
+				        	float y = (float)l_pt.m_y;
+				        	float z = (float)l_pt.m_z;
+				        	float r = (float)l_pt.m_r/255.0f;
+				        	float g = (float)l_pt.m_g/255.0f;
+				        	float b = (float)l_pt.m_b/255.0f;
+			                vertexBuffer.put((float) x);
+			                vertexBuffer.put((float) y);
+			                vertexBuffer.put((float) z);
+			                vertexBuffer.put((float) r);
+			                vertexBuffer.put((float) g);
+			                vertexBuffer.put((float) b);
+			                vertexBuffer.put((float) 1.0f);
+			                indexBuffer.put(l_count++);
+			                ++l_vc;
+			        	}
+			        }
+		        	//System.out.println("filtered out "+(m_points.get(al).size()-l_vc));
+		        	for(int j=0; j<m_points.get(al).size()-l_vc; ++j)
+		        	{
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		vertexBuffer.put(0.0f);
+		        		indexBuffer.put(l_count++);
+		        	}
+		        	m_vertexdisplaycount.set(al, Integer.valueOf(l_vc) );
 		        }
 			            
 		        // Tell openGL that we filled the buffers.
@@ -232,7 +278,7 @@ class PointCloudObject implements Runnable {
 			if(!GLok("Setting glBindVertexArray")) return;
 			
 			
-			glDrawElements(GL_POINTS, m_vertexcount.get(a_list), GL_UNSIGNED_INT, m_vertexoffset.get(a_list)*4);
+			glDrawElements(GL_POINTS, m_vertexdisplaycount.get(a_list), GL_UNSIGNED_INT, m_vertexoffset.get(a_list)*4);
 			if(!GLok("glDrawElements")) return;
 		}
 	}
@@ -247,6 +293,7 @@ class PointCloudObject implements Runnable {
 				m_points.add(new ArrayList<RGB3DPoint>());
 				m_vertexcount.add(Integer.valueOf(0));
 				m_vertexoffset.add(Integer.valueOf(0));
+				m_vertexdisplaycount.add(Integer.valueOf(0));
 			}
 			this.m_points.get(a_list).add(l_point);
 			//m_refresh = true;
@@ -261,6 +308,7 @@ class PointCloudObject implements Runnable {
 				m_points.add(new ArrayList<RGB3DPoint>());
 				m_vertexcount.add(Integer.valueOf(0));
 				m_vertexoffset.add(Integer.valueOf(0));
+				m_vertexdisplaycount.add(Integer.valueOf(0));
 			}
 			this.m_points.get(a_list).add(a_point);
 			//m_refresh = true;
@@ -621,8 +669,8 @@ class PointCloudObject implements Runnable {
 			
 			modelM.identity();
 			q = new Quaternionf();
-			modelM.rotate(q.rotateY((float) Math.toRadians(-i*m_tt_angle+m_rot)).normalize());
-			modelM.translate(m_Xrotoff, 500.0f, m_Zrotoff);
+			modelM.rotate(q.rotateY((float) Math.toRadians(i*m_tt_angle+m_rot)).normalize());
+			modelM.translate(m_Xrotoff, 500.0f, -m_Zrotoff);
 			//modelM.translate(0.0f, 0.0f, -2000.0f);
 			modelViewLoc = glGetUniformLocation(l_program, "modelView");
 			if (!GLok("Calling glGetUniformLocation"))
@@ -852,10 +900,24 @@ class PointCloudObject implements Runnable {
 		glfwSetWindowShouldClose(m_window, true);
 	}
 
-	public void setTT(float a_angle, int a_Zrotoff, int a_Xrotoff) {
+	public void setTT(float a_angle, int a_Zrotoff, int a_Xrotoff,
+			int a_leftfilter,
+			int a_rightfilter,
+			int a_topfilter,
+			int a_bottomfilter,
+			int a_frontfilter,
+			int a_backfilter) {
 		m_tt_angle = a_angle;
 		m_Zrotoff = a_Zrotoff;
 		m_Xrotoff = a_Xrotoff;
+		
+		m_leftfilter = a_leftfilter;
+		m_rightfilter = a_rightfilter;
+		m_topfilter = a_topfilter;
+		m_bottomfilter = a_bottomfilter;
+		m_frontfilter = a_frontfilter;
+		m_backfilter = a_backfilter;
+
 	}
 
 }

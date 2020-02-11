@@ -5,6 +5,7 @@ layout(location = 1) in vec4 color;
 uniform mat4 modelView;
 uniform float scale;
 uniform float pointsize;
+
 out vec4 v_color;
 void main(void) {
  	gl_Position = vertex;
