@@ -98,8 +98,9 @@ class PointCloudObject implements Runnable {
 	ArrayList<Integer> m_vertexdisplaycount = null;
 	ArrayList<Integer> m_vertexoffset = null;
 	private float m_tt_angle;
-	private int m_Zrotoff;
-	private int m_Xrotoff;
+	private int m_Zrotoff = 0;
+	private int m_Xrotoff = 0;
+	private int m_Ydispoff = 0;
 	
 	private int m_leftfilter = -5000;
 	private int m_rightfilter = 5000;
@@ -670,7 +671,7 @@ class PointCloudObject implements Runnable {
 			modelM.identity();
 			q = new Quaternionf();
 			modelM.rotate(q.rotateY((float) Math.toRadians(i*m_tt_angle+m_rot)).normalize());
-			modelM.translate(m_Xrotoff, 500.0f, -m_Zrotoff);
+			modelM.translate(m_Xrotoff, m_Ydispoff, -m_Zrotoff);
 			//modelM.translate(0.0f, 0.0f, -2000.0f);
 			modelViewLoc = glGetUniformLocation(l_program, "modelView");
 			if (!GLok("Calling glGetUniformLocation"))
@@ -900,7 +901,7 @@ class PointCloudObject implements Runnable {
 		glfwSetWindowShouldClose(m_window, true);
 	}
 
-	public void setTT(float a_angle, int a_Zrotoff, int a_Xrotoff,
+	public void setTT(float a_angle, int a_Zrotoff, int a_Xrotoff, int a_Ydispoff,
 			int a_leftfilter,
 			int a_rightfilter,
 			int a_topfilter,
@@ -910,6 +911,7 @@ class PointCloudObject implements Runnable {
 		m_tt_angle = a_angle;
 		m_Zrotoff = a_Zrotoff;
 		m_Xrotoff = a_Xrotoff;
+		m_Ydispoff = a_Ydispoff;
 		
 		m_leftfilter = a_leftfilter;
 		m_rightfilter = a_rightfilter;

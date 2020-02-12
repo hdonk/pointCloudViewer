@@ -196,6 +196,7 @@ public class pointCloudViewer implements Runnable
 		            			float l_angle = l_dis.readFloat();
 		            			int l_Zrotoff = l_dis.readInt();
 		            			int l_Xrotoff = l_dis.readInt();
+		            			int l_Ydispoff = l_dis.readInt();
 		            			int l_leftfilter = l_dis.readInt();
 		            			int l_rightfilter = l_dis.readInt();
 		            			int l_topfilter = l_dis.readInt();
@@ -203,7 +204,7 @@ public class pointCloudViewer implements Runnable
 		            			int l_fronttfilter = l_dis.readInt();
 		            			int l_backfilter = l_dis.readInt();
 		            			System.out.println("TT rot "+l_angle+" Z "+l_Zrotoff+" X "+l_Xrotoff);
-		            			m_pco.setTT(l_angle, l_Zrotoff, l_Xrotoff,
+		            			m_pco.setTT(l_angle, l_Zrotoff, l_Xrotoff, l_Ydispoff,
 				            			l_leftfilter,
 				            			l_rightfilter,
 				            			l_topfilter,
